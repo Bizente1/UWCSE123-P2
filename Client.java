@@ -5,7 +5,7 @@ public class Client {
     private static final Random RAND = new Random();
 
     public static void main(String[] args) throws Exception {
-        // List<Region> scenario = createRandomScenario(10, 10, 100, 1000, 100000);
+        //List<Region> scenario = createRandomScenario(10, 10, 100, 1000, 100000);
         List<Region> scenario = createSimpleScenario();
         System.out.println(scenario);
         
@@ -14,8 +14,47 @@ public class Client {
         printResult(allocation, budget);
     }
 
+    /*
+     * Pre: This the method takes two parameters, first a double that represents the
+     *  the budget that is to be allocated to the Regions. The Second Parameter is
+     *  List of Regions which we have distribue the budget across.
+     *  A error will be thrown if the List given in null
+     * 
+     * Post: Returns a Allocation that represents the regions that will be helped inorder to 
+     * maxium amount of people that can be helped with the given buget
+     */
     public static Allocation allocateRelief(double budget, List<Region> sites) {
-        // TODO: implement your method here
+        if(sites == null){
+            throw new IllegalArgumentException("The List of sites given was null");
+        }
+
+        return allocateRelief(budget, sites, new Allocation());
+    }
+
+    private static Allocation allocateRelief(double budget, List<Region> sites, Allocation allocated){
+        if(budget <= 0 || sites.isEmpty()){
+            //System.out.println(allocated);
+            return allocated;
+        }
+
+        Allocation best = allocated;
+
+        for(int i = 0; i < sites.size(); i++){
+
+            Region site  = sites.remove(i);
+            if(budget - site.getCost()  >= 0);{
+                Allocation newAllocation = allocateRelief(budget, sites, allocated.withRegion(site));
+                if(best.totalPeople() < newAllocation.totalPeople()){
+                    best =  newAllocation;
+                }
+            }
+            sites.add(i, site);
+            
+        }
+        return best;
+    
+
+        
     }
 
     // TODO: add any of your own helper methods here
