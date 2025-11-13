@@ -42,11 +42,17 @@ public class Client {
         for(int i = 0; i < sites.size(); i++){
 
             Region site  = sites.remove(i);
-            if(budget - site.getCost()  >= 0);{
-                Allocation newAllocation = allocateRelief(budget, sites, allocated.withRegion(site));
+            if(budget - site.getCost()  >= 0){
+                Allocation newAllocation = allocateRelief(budget - site.getCost(), sites, allocated.withRegion(site));
                 if(best.totalPeople() < newAllocation.totalPeople()){
                     best =  newAllocation;
                 }
+            }
+
+            Allocation skipCaseAllocation = allocateRelief(budget, sites, allocated);
+            
+            if(skipCaseAllocation.totalPeople() > best.totalPeople()){
+                best = skipCaseAllocation;
             }
             sites.add(i, site);
             
