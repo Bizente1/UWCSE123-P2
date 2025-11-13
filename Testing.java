@@ -9,12 +9,17 @@ public class Testing {
     @DisplayName("STUDENT TEST - Case #1")
     public void firstTestCase() {
         List<Region> result = new ArrayList<>();
+        Allocation test = new Allocation();
         result.add(new Region("1", 30, 300));
         result.add(new Region("2", 60, 600));
         result.add(new Region("3", 40, 400));
         result.add(new Region("4", 80, 800));
+        test = test.withRegion(new Region("1", 30, 300));
+        test = test.withRegion(new Region("2", 60, 600));
+        test = test.withRegion(new Region("3", 40, 400));
+        test = test.withRegion(new Region("4", 80, 800));
 
-        assertEquals(210, Client.allocateRelief(2100, result).totalPeople());
+        assertEquals(test, Client.allocateRelief(2100, result));
     }
 
     @Test
@@ -26,18 +31,21 @@ public class Testing {
         result.add(new Region("3", 40, 400));
         result.add(new Region("4", 80, 800));
 
-        assertEquals(0, Client.allocateRelief(0, result).totalPeople());
+        assertEquals(new Allocation(), Client.allocateRelief(0, result));
     }
 
     @Test
     @DisplayName("STUDENT TEST - Case #3")
     public void thirdTestCase() {
         List<Region> result = new ArrayList<>();
+        Allocation test = new Allocation();
         result.add(new Region("1", 30, 300));
         result.add(new Region("2", 60, 600));
         result.add(new Region("3", 40, 400));
         result.add(new Region("4", 80, 800));
-
+        test = test.withRegion(new Region("3", 40, 400));
+        test = test.withRegion(new Region("4", 80, 800));
+        
         assertEquals(120, Client.allocateRelief(1200, result).totalPeople());
     }
 }

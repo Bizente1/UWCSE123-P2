@@ -5,10 +5,10 @@ public class Client {
     private static final Random RAND = new Random();
 
     public static void main(String[] args) throws Exception {
-        //List<Region> scenario = createRandomScenario(10, 10, 100, 1000, 100000);
+        // List<Region> scenario = createRandomScenario(10, 10, 100, 1000, 100000);
         List<Region> scenario = createSimpleScenario();
         System.out.println(scenario);
-        
+
         double budget = 2000;
         Allocation allocation = allocateRelief(budget, scenario);
         printResult(allocation, budget);
@@ -16,51 +16,74 @@ public class Client {
 
     /*
      * Pre: This the method takes two parameters, first a double that represents the
-     *  the budget that is to be allocated to the Regions. The Second Parameter is
-     *  List of Regions which we have distribue the budget across.
-     *  A error will be thrown if the List given in null
+     * the budget that is to be allocated to the Regions. The Second Parameter is
+     * List of Regions which we have distribue the budget across.
+     * A error will be thrown if the List given in null
      * 
-     * Post: Returns a Allocation that represents the regions that will be helped inorder to 
-     * maxium amount of people that can be helped with the given buget
+     * Post: Returns a Allocation that represents the regions 
+     * that will be helped inorder to
+     * maxium amount of people that can be helped with 
+     * the given buget and if multiple different
+     * Allocation help the same amount of people then the 
+     * one with the lowest cost is choosen.
      */
     public static Allocation allocateRelief(double budget, List<Region> sites) {
-        if(sites == null){
+        if (sites == null) {
             throw new IllegalArgumentException("The List of sites given was null");
         }
-
         return allocateRelief(budget, sites, new Allocation());
     }
 
-    private static Allocation allocateRelief(double budget, List<Region> sites, Allocation allocated){
-        if(budget <= 0 || sites.isEmpty()){
-            //System.out.println(allocated);
+    /*
+     * Pre: This is a private method that is the helper method to the
+     * public allocateRelief method.
+     * This the method takes THREE parameters, first a double that represents the
+     * the budget that is to be allocated to the Regions. The Second Parameter is
+     * List of Regions which we have distribue the budget across. The 3rd parameter
+     * is a Allocation that in the helper method represents the current best
+     * allocation
+     * of the budget.
+     * 
+     * Post: Returns a Allocation that represents the regions that will be helped inorder to
+     * maxium amount of people that can be helped with the given budget. 
+     * It uses Recursion to  do back tracking and check 
+     * all possible combination of regions that have less total cost  then the budget.
+     * Its base case is either the budget is zero or less or the size of the
+     * passed list is empty, it will then compare if the current Allocation is
+     * better then the one passed in and will return which ever is better.
+     * Better in this case means more people are helped and if they
+     * help the same amount of people then which ever one cost less is choosen.
+     */
+    private static Allocation allocateRelief(double budget, List<Region> sites, Allocation allocated) {
+        if (budget <= 0 || sites.isEmpty()) {
             return allocated;
         }
 
         Allocation best = allocated;
 
-        for(int i = 0; i < sites.size(); i++){
-
-            Region site  = sites.remove(i);
-            if(budget - site.getCost()  >= 0){
+        for (int i = 0; i < sites.size(); i++) {
+            Region site = sites.remove(i);
+            if (budget - site.getCost() >= 0) {
                 Allocation newAllocation = allocateRelief(budget - site.getCost(), sites, allocated.withRegion(site));
-                if(best.totalPeople() < newAllocation.totalPeople()){
-                    best =  newAllocation;
+                if (best.totalPeople() < newAllocation.totalPeople()) {
+                    best = newAllocation;
                 }
             }
 
             Allocation skipCaseAllocation = allocateRelief(budget, sites, allocated);
-            
-            if(skipCaseAllocation.totalPeople() > best.totalPeople()){
+
+            if (skipCaseAllocation.totalPeople() > best.totalPeople()) {
                 best = skipCaseAllocation;
+            } else if (skipCaseAllocation.totalPeople() == best.totalPeople()) {
+                if (best.totalCost() > skipCaseAllocation.totalCost()) {
+                    best = skipCaseAllocation;
+                }
             }
             sites.add(i, site);
-            
+
         }
         return best;
-    
 
-        
     }
 
     // TODO: add any of your own helper methods here
@@ -68,12 +91,14 @@ public class Client {
     ///////////////////////////////////////////////////////////////////////////
     // PROVIDED HELPER METHODS - **DO NOT MODIFY ANYTHING BELOW THIS LINE!** //
     ///////////////////////////////////////////////////////////////////////////
-    
+
     /**
-    * Prints each allocation in the provided set. Useful for getting a quick overview
-    * of all allocations currently in the system.
-    * @param allocations Set of allocations to print
-    */
+     * Prints each allocation in the provided set. Useful for getting a quick
+     * overview
+     * of all allocations currently in the system.
+     * 
+     * @param allocations Set of allocations to print
+     */
     public static void printAllocations(Set<Allocation> allocations) {
         System.out.println("All Allocations:");
         for (Allocation a : allocations) {
@@ -82,12 +107,13 @@ public class Client {
     }
 
     /**
-    * Prints details about a specific allocation result, including the total people
-    * helped, total cost, and any leftover budget. Handy for checking if we're
-    * within budget limits!
-    * @param alloc The allocation to print
-    * @param budget The budget to compare against
-    */
+     * Prints details about a specific allocation result, including the total people
+     * helped, total cost, and any leftover budget. Handy for checking if we're
+     * within budget limits!
+     * 
+     * @param alloc  The allocation to print
+     * @param budget The budget to compare against
+     */
     public static void printResult(Allocation alloc, double budget) {
         System.out.println("Result: ");
         System.out.println("  " + alloc);
@@ -97,17 +123,19 @@ public class Client {
     }
 
     /**
-    * Creates a scenario with numRegions regions by randomly choosing the population 
-    * and cost of each region.
-    * @param numRegions Number of regions to create
-    * @param minPop Minimum population per region
-    * @param maxPop Maximum population per region
-    * @param minCostPer Minimum cost per person
-    * @param maxCostPer Maximum cost per person
-    * @return A list of randomly generated regions
-    */
+     * Creates a scenario with numRegions regions by randomly choosing the
+     * population
+     * and cost of each region.
+     * 
+     * @param numRegions Number of regions to create
+     * @param minPop     Minimum population per region
+     * @param maxPop     Maximum population per region
+     * @param minCostPer Minimum cost per person
+     * @param maxCostPer Maximum cost per person
+     * @return A list of randomly generated regions
+     */
     public static List<Region> createRandomScenario(int numRegions, int minPop, int maxPop,
-                                                    double minCostPer, double maxCostPer) {
+            double minCostPer, double maxCostPer) {
         List<Region> result = new ArrayList<>();
 
         for (int i = 0; i < numRegions; i++) {
@@ -120,9 +148,10 @@ public class Client {
     }
 
     /**
-    * Manually creates a simple list of regions to represent a known scenario.
-    * @return A simple list of regions
-    */
+     * Manually creates a simple list of regions to represent a known scenario.
+     * 
+     * @return A simple list of regions
+     */
     public static List<Region> createSimpleScenario() {
         List<Region> result = new ArrayList<>();
 
@@ -133,13 +162,14 @@ public class Client {
         result.add(new Region("Region #5", 200, 900));
 
         return result;
-    }    
+    }
 
     /**
-    * Rounds a number to two decimal places.
-    * @param num The number to round
-    * @return The number rounded to two decimal places
-    */
+     * Rounds a number to two decimal places.
+     * 
+     * @param num The number to round
+     * @return The number rounded to two decimal places
+     */
     private static double round2(double num) {
         return Math.round(num * 100) / 100.0;
     }
